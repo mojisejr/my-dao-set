@@ -8,8 +8,10 @@ import "@openzeppelin/contracts/governance/extensions/GovernorTimelockCompound.s
 import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import "./GovernorSettings.sol";
 
+
 contract ChickenDAOGovernor is Governor, GovernorVotes, GovernorTimelockCompound, GovernorSettings, GovernorCountingSimple, GovernorVotesQuorumFraction {
 
+    bool public timelockSattled = false;  
     constructor(IVotes _nft, ICompoundTimelock _timelock, uint256 _votingDelay, uint256 _votingPeriod, uint256 _proposalThreshold)
     Governor("ChickenDAOGovernor")
     GovernorVotes(_nft)
@@ -18,6 +20,11 @@ contract ChickenDAOGovernor is Governor, GovernorVotes, GovernorTimelockCompound
     GovernorTimelockCompound(_timelock)
     {}    
 
+    function acceptTimelockAdmin(ICompoundTimelock timelock) public {
+        require(timelockSattled, "timelock is already succesfully set.");
+        timelockSattled = true;
+        timelock.acceptAdmin();
+    }
 
     function quorum(uint256 blockNumber) public view override(IGovernor, GovernorVotesQuorumFraction) returns(uint256) {
         return super.quorum(blockNumber);

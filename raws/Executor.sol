@@ -2,7 +2,6 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "hardhat/console.sol";
 
 contract ChickenDAOExecutor {
     using SafeMath for uint256;
@@ -36,9 +35,9 @@ contract ChickenDAOExecutor {
     );
 
     // NOTE: THESE VALUES ARE FOR TESTING ONLY!
-    uint256 public constant GRACE_PERIOD = 2 days;
-    uint256 public constant MINIMUM_DELAY = 1 seconds;
-    uint256 public constant MAXIMUM_DELAY = 5 days;
+    uint256 public constant GRACE_PERIOD = 5 days;
+    uint256 public constant MINIMUM_DELAY = 3 days;
+    uint256 public constant MAXIMUM_DELAY = 7 days;
 
     address public admin;
     address public pendingAdmin;

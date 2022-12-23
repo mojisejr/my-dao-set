@@ -1,18 +1,28 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const nftFac = await ethers.getContractFactory("ChickenDAOAuctionHouse");
+  const auctionFac = await ethers.getContractFactory("ChickenDAONFT");
+  const timelockFac = await ethers.getContractFactory("ChickenDAOExecutor");
+  const [signer] = await ethers.getSigners();
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  //1. deploy timelock
+  const timelockDelay = 86400;
+  const timelock = await timelockFac.deploy(signer.address, timelockDelay);
+  await timelock.deployed();
+  //2. deploy auction house
+  const auction = await auctionFac.deploy(signer.address, timelock.address);
+  await auction.deployed();
+  //3. deploy nft
+  const nft = await nftFac.deploy(signer.address, auction.address);
+  await nft.deployed();
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  console.log({
+    signer: signer.address,
+    timelock: timelock.address,
+    auction: auction.address,
+    nft: nft.address,
+  });
 }
 
 // We recommend this pattern to be able to use async/await everywhere
